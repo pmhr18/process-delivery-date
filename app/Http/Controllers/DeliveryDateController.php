@@ -14,9 +14,10 @@ class DeliveryDateController extends Controller
         $fastestDeliveryDate = Config::get('myconfig.fastest_delivery_date');
         $outputDays = Config::get('myconfig.output_days');
         $shippingDeadline = Config::get('myconfig.shipping_deadline');
+        $excludeWeekday = Config::get('myconfig.exclude_weekday');
 
         // 配送候補日を生成
-        $fetchDeliverySlecetDays = [];
+        $fetchDeliverySelectDays = [];
         
         // 設定(1)
         // 最短発送日の値により開始日を設定
@@ -35,12 +36,18 @@ class DeliveryDateController extends Controller
             }
         }
 
-        // 設定(2)
+        // 設定(2),(4)
         // 出力日数の値分配送候補日を取得し、追加する
-        for ($i = 0; $i < $outputDays; $i++) {
-            $fetchDeliverySlecetDays[] = $startDate->format('Y-m-d');
+        // 配送日を除外する曜日の設定が true の日付については、配送候補日に追加しない
+        while (count($fetchDeliverySelectDays) < $outputDays) {
+            if (!$excludeWeekday[$startDate->dayOfWeek]['is_effective']) {
+                $fetchDeliverySelectDays[] = $startDate->format('Y-m-d');
+            }
             $startDate->addDay();
         }
+        
+        dd($fetchDeliverySelectDays);
+
 
         return view('form', compact(
             '',
