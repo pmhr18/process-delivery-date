@@ -21,7 +21,7 @@ class DeliveryDateController extends Controller
         
         // 設定(1)
         // 最短発送日の値により開始日を設定
-        $startDate = Carbon::now()->addDays($fastestDeliveryDate)->startOfDay();
+        $baseDate = Carbon::now()->addDays($fastestDeliveryDate)->startOfDay();
 
         // 現在時刻を取得
         $currentTime = Carbon::now()->hour;
@@ -32,7 +32,7 @@ class DeliveryDateController extends Controller
             if ($currentTime >= $shippingDeadline['deadline_hour']) {
                 // 締切設定時間を過ぎている場合のみ、最短発送日を設定日分後ろ倒す
                 $delayDays = $shippingDeadline['delay_date'];
-                $startDate->addDays($delayDays);
+                $baseDate->addDays($delayDays);
             }
         }
 
@@ -40,10 +40,10 @@ class DeliveryDateController extends Controller
         // 出力日数の値分配送候補日を取得し、追加する
         // 配送日を除外する曜日の設定が true の日付については、配送候補日に追加しない
         while (count($fetchDeliverySelectDays) < $outputDays) {
-            if (!$excludeWeekday[$startDate->dayOfWeek]['is_effective']) {
-                $fetchDeliverySelectDays[] = $startDate->format('Y-m-d');
+            if (!$excludeWeekday[$baseDate->dayOfWeek]['is_effective']) {
+                $fetchDeliverySelectDays[] = $baseDate->format('Y-m-d');
             }
-            $startDate->addDay();
+            $baseDate->addDay();
         }
         
         dd($fetchDeliverySelectDays);
