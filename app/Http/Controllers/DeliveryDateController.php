@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 class DeliveryDateController extends Controller
 {
     public function index()
-    {
+    {        
         // 設定値を取得
         $fastestDeliveryDate = Config::get('myconfig.fastest_delivery_date');
         $outputDays = Config::get('myconfig.output_days');
@@ -20,6 +20,7 @@ class DeliveryDateController extends Controller
 
         // 配送候補日を初期化
         $fetchDeliverySelectDays = [];
+        $fetchDeliverySelectDaysValues = [];
         
         // 設定(1)
         // 最短発送日の値により開始日を設定
@@ -52,18 +53,15 @@ class DeliveryDateController extends Controller
         // 配送日を除外する曜日の設定が true の日付については、配送候補日に追加しない
         while (count($fetchDeliverySelectDays) < $outputDays) {
             if (!$excludeWeekday[$baseDate->dayOfWeek]['is_effective']) {
-                $fetchDeliverySelectDays[] = $baseDate->format('Y-m-d');
+                $fetchDeliverySelectDays[] = $baseDate->isoFormat('YYYY年MM月DD日(ddd)');
+                $fetchDeliverySelectDaysValues[] = $baseDate->format('Y-m-d');
             }
             $baseDate->addDay();
         }
 
         return view('form', compact(
             'fetchDeliverySelectDays',
+            'fetchDeliverySelectDaysValues',
         ));
-    }
-
-    public function store(Request $request)
-    {
-        // 
     }
 }

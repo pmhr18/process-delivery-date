@@ -15,4 +15,3 @@ use App\Http\Controllers\DeliveryDateController;
 */
 
 Route::get('/', [DeliveryDateController::class, 'index']);
-Route::post('/', [DeliveryDateController::class, 'store']);
