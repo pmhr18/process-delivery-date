@@ -7,7 +7,7 @@ return [
     'output_days' => 5,
     // 設定値(3)
     'shipping_deadline' => [
-        'deadline_hour' => 8,
+        'deadline_hour' => 15,
         'delay_date' => 1,
         'is_effective' => true
     ],
