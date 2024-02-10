@@ -15,8 +15,10 @@ class DeliveryDateController extends Controller
         $outputDays = Config::get('myconfig.output_days');
         $shippingDeadline = Config::get('myconfig.shipping_deadline');
         $excludeWeekday = Config::get('myconfig.exclude_weekday');
+        $delaySetPrefectures = Config::get('myconfig.delay_set_prefectures');
+        $destinationPrefecture = Config::get('myconfig.destination_prefecture');
 
-        // 配送候補日を生成
+        // 配送候補日を初期化
         $fetchDeliverySelectDays = [];
         
         // 設定(1)
@@ -36,6 +38,15 @@ class DeliveryDateController extends Controller
             }
         }
 
+        // 設定(5)
+        // 設定された配送先によって最短発送日を各都道府県の値分、後ろ倒す
+        foreach ($delaySetPrefectures as $prefecture) {
+            if ($destinationPrefecture === $prefecture['id']) {
+                $baseDate->addDays($prefecture['delay_date']);
+                break;
+            }
+        }
+
         // 設定(2),(4)
         // 出力日数の値分配送候補日を取得し、追加する
         // 配送日を除外する曜日の設定が true の日付については、配送候補日に追加しない
@@ -45,12 +56,9 @@ class DeliveryDateController extends Controller
             }
             $baseDate->addDay();
         }
-        
-        dd($fetchDeliverySelectDays);
-
 
         return view('form', compact(
-            '',
+            'fetchDeliverySelectDays',
         ));
     }
 
